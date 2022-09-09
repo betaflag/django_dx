@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "django-dx"
+version = "1.0.0"
+description = "Django Developer Setup"
+authors = ["Nicolas Lupien"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "django_dx"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Django = "^4.1.1"
+python-dotenv = "^0.21.0"
+psycopg2 = "^2.9.3"
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^1.7.0"
+pylint-django = "^2.5.3"
+pytest-django = "^4.5.2"
+python-dotenv = "^0.21.0"
+isort = "^5.10.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

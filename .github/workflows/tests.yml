@@ -1,0 +1,16 @@
+name: tests
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          cache: 'poetry'
+      - run: poetry install
+      - name: Run Tests
+        run: poetry run pytest

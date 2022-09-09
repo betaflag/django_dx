@@ -1,0 +1,6 @@
+[MASTER]
+load-plugins=pylint_django, pylint_django.checkers.migrations
+django-settings-module=django_dx.settings
+
+[FORMAT]
+max-line-length=120
