@@ -3,7 +3,8 @@ name: Create and publish a Docker image
 on:
   push:
     branches: ['main']
-
+    paths-ignore:
+      - '**/README.md'
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
