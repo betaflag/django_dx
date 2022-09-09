@@ -4,3 +4,6 @@ django-settings-module=django_dx.settings
 
 [FORMAT]
 max-line-length=120
+
+[MESSAGES CONTROL]
+disable=missing-docstring
