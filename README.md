@@ -56,7 +56,7 @@ There's a plugin to also manage virtual environment with pyenv but I prefer usin
 
 ## Poetry
 
-[poetry](https://python-poetry.org/) is a wonderful that manages python dependencies and virtual environment in a way similar to NPM's package.json and Ruby's bundler. It has a few features that makes life simpler that using pip and it's also wonderfully integrated into VSCode.
+[poetry](https://python-poetry.org/) is a wonderful tool that manages python dependencies and virtual environment in a way similar to NPM's package.json and Ruby's bundler. It has a few features that makes life simpler than using pip and it's also wonderfully integrated into VSCode.
 
 ### Installation
 
