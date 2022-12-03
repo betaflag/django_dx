@@ -146,7 +146,6 @@ poetry add -D isort
 VSCode can sort your import with the `Python Refactor: Sort Imports` command.
 
 ```json
-# .vscode/settings.json
 {
     "python.sortImports.args": ["--atomic"],
     "[python]": {
@@ -173,7 +172,6 @@ poestry add -D autopep8
 Like the other tools, it's dierctly integrated with VSCode and you just need to turn it on. I only change the max-line-length to 120 because I find the default (80) to small.
 
 ```json
-# .vscode/settings.json
 {
     "python.formatting.provider": "autopep8",
     "python.formatting.autopep8Args": [
@@ -193,7 +191,7 @@ Like the other tools, it's dierctly integrated with VSCode and you just need to 
 
 Any config in settings.py that is secret or that change between environment should be replaced with an environment variable.
 
-## Installation
+### Installation
 
 ```sh
 poetry add python-dotenv
