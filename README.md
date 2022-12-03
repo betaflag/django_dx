@@ -293,3 +293,46 @@ your_app/
     a_tests.py
     b_tests.py
 ```
+
+## Gunicorn
+
+Sooner or later you'll want to make your application available to other people. The internal server that you starts with `python manage.py runserver` is a development server not suited for production. You need a production-ready application server.
+
+[Gunicorn](https://gunicorn.org/) is one of the most popular option. It's scalable and easy to use.
+
+### Installation
+
+```sh
+poetry add gunicorn
+```
+
+Create `gunicorn.conf.py` at the root of your project
+
+```py
+import os
+
+workers = os.getenv("GUNICORN_WORKERS", "3")
+threads = os.getenv("GUNICORN_THREADS", "1")
+timeout = os.getenv("GUNICORN_TIMEOUT", "0")
+bind = "0.0.0.0:" + os.getenv("PORT", "8000")
+accesslog = "-"
+errorlog = "-"
+```
+
+All these options can also be passed to the gunicorn command line executable but I prefer to add them like this to use env variable. Each servers can be configured with own CPU/RAM to use a different amount of workers and threads.
+
+### Usage
+
+You can run gunicorn at any time with this:
+
+```sh
+gunicorn django_dx.wsgi:application
+```
+
+You will want to keep using `runserver` in development because of the autoreload.
+
+### Tips
+
+Configure workers with this rule:
+
+> A positive integer generally in the 2-4 x $(NUM_CORES) range. You’ll want to vary this a bit to find the best for your particular application’s work load.
