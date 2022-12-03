@@ -249,3 +249,47 @@ DATABASES = {
 To configure an environment you can either use environment variables that you configure in the OS or create/copy a secret `.env` file specific for this environment at the root of the code base.
 
 Many managed production environment like Heroku, App Engine, etc to provide you with an interface to create environment variable. Docker and Docker Compose also have settings to help you configure env variables.
+
+## Pytest
+
+[pytest](https://docs.pytest.org/) is a unit test framework that improves on Python's unittest library. It's a drop-in replacement with some extra features that are very useful like running the tests directly in VSCode.
+
+### Installation
+
+I use `pytest-django` plugin which includes the dependency on `pytest` and allow configuration of Django.
+
+```sh
+poetry add -D pytest-django
+```
+
+Create `pytest.ini` at the root of your project
+
+```ini
+[pytest]
+DJANGO_SETTINGS_MODULE = django_dx.settings
+python_files = tests.py test_*.py *_tests.py
+```
+
+Replace `django_dx.settings` with the path to your `settings.py`.
+
+### Usage
+
+Simply add your tests as usual in your app `tests.py` file. And simply run
+
+```sh
+pytest
+```
+
+The test will show in VSCode in the testing tab. You'll be able to run tests individually and also debug them.
+
+### Tips
+
+If the `tests.py` file gets too large, you can split them by creating a `tests` folder like this:
+
+```sh
+your_app/
+  tests/
+    __init__.py
+    a_tests.py
+    b_tests.py
+```
