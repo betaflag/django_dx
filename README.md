@@ -336,3 +336,130 @@ You will want to keep using `runserver` in development because of the autoreload
 Configure workers with this rule:
 
 > A positive integer generally in the 2-4 x $(NUM_CORES) range. You’ll want to vary this a bit to find the best for your particular application’s work load.
+
+## Celery
+
+[Celery](https://docs.celeryq.dev/) is an asynchronous task queue to run background task. Use it to asynchronously run any piece of code fetching or pushing to external services or methods that takes some time to process.
+
+## Installation
+
+```sh
+poetry add "celery[redis]"
+```
+
+Change your project init file (mine is `django_dx/django_dx/__init__.py` to include this:
+
+```py
+# This will make sure the app is always imported when
+# Django starts so that shared_task will use this app.
+from .celery import app as celery_app
+
+__all__ = ('celery_app',)
+```
+
+Add `celery.py` in your project folder (mine is `django_dx/django_dx/celery.py`):
+
+```py
+import os
+
+from celery import Celery
+
+# Set the default Django settings module for the 'celery' program.
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_dx.settings')
+
+app = Celery('django_dx')
+
+# Using a string here means the worker doesn't have to serialize
+# the configuration object to child processes.
+# - namespace='CELERY' means all celery-related configuration keys
+#   should have a `CELERY_` prefix.
+app.config_from_object('django.conf:settings', namespace='CELERY')
+
+# Load task modules from all registered Django apps.
+app.autodiscover_tasks()
+```
+
+Change the reference to django_dx to the name of your project
+
+Add this to your `settings.py`
+
+```py
+# Celery
+# https://docs.celeryq.dev/en/stable/django/first-steps-with-django.html
+
+CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
+CELERY_RESULT_BACKEND = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
+```
+
+### Usage
+
+Add your task in `tasks.py` in your django apps.
+
+```py
+# my_app/tasks.py
+
+from celery import shared_task
+
+@shared_task
+def add(x, y):
+    return x + y
+```
+
+You can call this task anywhere like this:
+
+```py
+from my_app.tasks import add
+
+add.delay(1, 2)
+```
+
+You need to start a worker to process the tasks
+
+```py
+celery -A proj worker -l INFO
+```
+
+### Tips: Autoretry
+
+Use autoretry make sending emails resilient to SMTP failures.
+
+```py
+@shared_task(autoretry_for=(SMTPException,), max_retries=36, default_retry_delay=300)
+def send_email(...)
+    ...
+```
+
+This will retry sending the email every 5 minutes for 3 hours.
+
+### Tips: Queuing tasks in production
+
+When I want to manually queue a background task in production, I sometimes connect to a server and use django's `shell` command:
+
+```sh
+python manage.py shell
+
+python> from my_app.tasks import add
+python> add.delay(1, 2)
+```
+
+When connecting to a production server is restricted (and it should be!), you can use a Django migration to queue a task:
+
+```py
+from django.db import migrations
+from my_app.tasks import add
+
+def queue_task(apps, schema_editor):
+    add.delay(1, 2)
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        # Dependencies to other migrations
+    ]
+
+    operations = [
+        migrations.RunPython(queue_task, reverse_code=migrations.RunPython.noop, elidable=True),
+    ]
+```
+
+The `elidable=True` option will eliminate this migration when you run `squashmigrations`.
