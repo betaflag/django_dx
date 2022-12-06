@@ -2,20 +2,20 @@
 
 Supercharge your Django Development Experience with these tools and concepts 🚀
 
-- [#pyenv](#pyenv)
-- [#poetry](#poetry)
-- [#pylint](#pylint)
-- [#isort](#isort)
-- [#autopep8](#autopep8)
-- [#python-dotenv](#python-dotenv)
-- [#pytest](#pytest)
-- [#gunicorn](#gunicorn)
-- [#django-cache-framework](#django-cache-framework)
-- [#celery](#celery)
-- [#docker-compose](#docker-compose)
-- [#docker](#docker)
-- [#dependabot](#dependabot)
-- [#github-actions](#github-actions)
+- [pyenv](#pyenv)
+- [poetry](#poetry)
+- [pylint](#pylint)
+- [isort](#isort)
+- [autopep8](#autopep8)
+- [python-dotenv](#python-dotenv)
+- [pytest](#pytest)
+- [gunicorn](#gunicorn)
+- [django-cache-framework](#django-cache-framework)
+- [celery](#celery)
+- [docker-compose](#docker-compose)
+- [docker](#docker)
+- [dependabot](#dependabot)
+- [github-actions](#github-actions)
 
 ## Pyenv
 
