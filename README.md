@@ -606,3 +606,157 @@ I mostly use this Dockerfile for production but I occasionnaly build/run the ima
 ### Docker Tips: Production
 
 I use Github Actions to build and push the docker image to Github's Container registry. Then, I fetch and run the image on my production setup.
+
+## Dependabot
+
+Dependabot keeps my dependencies up to date. It opens a PR on Github when a dependecy updates.
+
+### Dependabot Installation
+
+Create the file `.github/dependabot.yml` at the root of your project.
+
+```yml
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: weekly
+      time: "07:00"
+      
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: weekly
+      time: "07:00"
+```
+
+This will adds dependabot for Poetry (via pip ecosystem) and also any dependencies in your Github Actions.
+
+## Github Actions
+
+These actions automate testing, linting and publishing code commited to git.
+
+### Github Actions : Linting
+
+This workflow ensure the code is linted correctly with `Pylint` on each push.
+
+```yml
+name: linter
+
+on:
+  push:
+    paths-ignore:
+      - '**/README.md'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python - --version 1.2.0
+          echo "PATH=${HOME}/.local/bin:${PATH}" >> $GITHUB_ENV
+      - uses: actions/setup-python@v4
+        with:
+          cache: 'poetry'
+      - run: poetry install
+      - name: Run Tests
+        run: poetry run pylint **/*.py
+```
+
+### Github Actions : Continuous Integration
+
+This workflow ensure the test suite passes on every push.
+
+```yml
+name: tests
+
+on:
+  push:
+    paths-ignore:
+      - '**/README.md'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: django_dx
+          POSTGRES_PASSWORD: django_dx
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python - --version 1.2.0
+          echo "PATH=${HOME}/.local/bin:${PATH}" >> $GITHUB_ENV
+      - uses: actions/setup-python@v4
+        with:
+          cache: 'poetry'
+      - run: poetry install
+      - name: Run Tests
+        run: poetry run pytest
+```
+
+### Github Actions : Continuous Deployment
+
+This workflow creates and publish the production Docker image to the Github's Container registry.
+
+```yml
+name: Create and publish a Docker image
+
+on:
+  push:
+    branches: ['main']
+    paths-ignore:
+      - '**/README.md'
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+```
