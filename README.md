@@ -413,7 +413,7 @@ from my_app.tasks import add
 add.delay(1, 2)
 ```
 
-You need to start a worker to process the tasks
+You need to start a worker to process the tasks. Note that the workers don't support autoreloading unfortunately.
 
 ```py
 celery -A proj worker -l INFO
@@ -463,3 +463,125 @@ class Migration(migrations.Migration):
 ```
 
 The `elidable=True` option will eliminate this migration when you run `squashmigrations`.
+
+## Docker Compose
+
+I use Docker Compose to easily spin up services required by my application in development so any contributor won't have to download and configure them.
+
+The `docker-compose.yml` file looks like this:
+
+```yml
+version: "3.9"
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: django_dx
+      POSTGRES_PASSWORD: django_dx
+      PGDATA: /data/postgres
+    ports:
+      - 5432:5432
+    volumes:
+       - django_dx_pgdata:/data/postgres
+
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+      
+volumes:
+  django_dx_pgdata:
+```
+
+### Usage
+
+Simply spin up the services with this command
+
+```sh
+docker compose up -d
+```
+
+And then you can run the develoment server as usual, without having to install and configure postgres and redis
+
+```sh
+python manage.py runserver
+```
+
+### Tips: Dev defaults
+
+I try to set the defaults value in the `settings.py` file to the coniguration of the services in the `docker-compose.yml`. The reason is that it makes it easy for new contributor to start the project without having to configure anything without compromising flexibility of setting the production configuration with environment variable.
+
+## Docker
+
+I use [Docker Desktop  for Mac](https://docs.docker.com/desktop/install/mac-install/).
+
+The production `Dockerfile` looks like this:
+
+```Dockerfile
+FROM python:3.10.4-slim-bullseye
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100 \
+    PYSETUP_PATH="/opt/pysetup" \
+    VENV_PATH="/opt/pysetup/.venv" \
+    POETRY_HOME="/opt/poetry" \
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_VERSION=1.2.0 
+
+ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
+
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y curl libpq-dev build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN curl -sSL https://install.python-poetry.org | python3 - --version 1.2.0
+
+WORKDIR $PYSETUP_PATH
+
+COPY poetry.lock pyproject.toml ./
+RUN poetry install --only main --no-root
+
+RUN addgroup --system app && adduser --system --group app
+USER app
+
+WORKDIR /app
+COPY --chown=app:app . .
+
+RUN python manage.py collectstatic --noinput
+
+CMD ["gunicorn", "--worker-tmp-dir", "/dev/shm", "django_dx.wsgi:application"]
+```
+
+### Usage
+
+Build the image
+
+```sh
+docker build django_dx
+```
+
+Run the image
+
+```sh
+docker run --rm -it -p 8000:8000 django_dx
+```
+
+### Tips: Development
+
+I mostly use this Dockerfile for production but I occasionnaly build/run the image on my development environment to test the image. It's a useful way to replicate the production runtime on my desktop.
+
+### Tips: Production
+
+I use Github Actions to build and push the docker image to Github's Container registry. Then, I fetch and run the image on my production setup.
+
