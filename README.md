@@ -1,6 +1,6 @@
 # django_dx
 
-This repository is my version of Django Cookie Cutter with all the things that I setup for most of my Django projects
+Supercharge your Django Development Experience with these tools and concepts 🚀
 
 - [#pyenv](#pyenv)
 - [#poetry](#poetry)
