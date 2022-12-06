@@ -359,7 +359,7 @@ CACHES = {
 
 [Celery](https://docs.celeryq.dev/) is an asynchronous task queue to run background task. Use it to asynchronously run any piece of code fetching or pushing to external services or methods that takes some time to process.
 
-## Celery Installation
+### Celery Installation
 
 ```sh
 poetry add "celery[redis]"
