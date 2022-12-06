@@ -25,7 +25,7 @@ This repository is my version of Django Cookie Cutter with all the things that I
 
 [pyenv](https://github.com/pyenv/pyenv) allows to manage multiple python version. This is useful when you are working on multiple Django application over the time. It also make sure everyone working on the project uses the same python version.
 
-### Installation
+### Pyenv Installation
 
 ```sh
 brew install pyenv
@@ -39,7 +39,7 @@ echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.
 echo 'eval "$(pyenv init -)"' >> ~/.zshrc
 ```
 
-### Usage
+### Pyenv Usage
 
 Create a `.python-version` at the root of your Django project with the python version that it is using.
 
@@ -58,7 +58,7 @@ There's a plugin to also manage virtual environment with pyenv but I prefer usin
 
 [poetry](https://python-poetry.org/) is a wonderful tool that manages python dependencies and virtual environment in a way similar to NPM's package.json and Ruby's bundler. It has a few features that makes life simpler than using pip and it's also wonderfully integrated into VSCode.
 
-### Installation
+### Poetry Installation
 
 ```sh
 curl -sSL https://install.python-poetry.org | python3 -
@@ -70,7 +70,7 @@ There's a post-installation step, I use **zsh** :
 poetry completions zsh > ~/.zfunc/_poetry`
 ```
 
-### Usage
+### Poetry Usage
 
 ```sh
 cd django-project/
@@ -89,7 +89,7 @@ poetry shell
 
 However, I'm always on the VSCode terminal and its activated automatically.
 
-### VSCode integration
+### Poetry VSCode integration
 
 VSCode should detect poetry environment automatically. It will provide autocompletion and source code links. You might need to select it with `Select python interpreter` command.
 
@@ -97,7 +97,7 @@ VSCode should detect poetry environment automatically. It will provide autocompl
 
 [pylint](https://pylint.pycqa.org/en/latest/) is a static code analyzer that helps you enforce best practices and python standards. 
 
-### Installation
+### Pylint Installation
 
 I'm using the `pylint-django` plugin that includes a dependency on pylint. It adds some configuration options for Django projects.
 
@@ -107,7 +107,7 @@ poetry add -D pylint-django
 
 Create `.pylintrc` file at the root of your project
 
-```sh
+```ini
 [MASTER]
 load-plugins=pylint_django, pylint_django.checkers.migrations
 django-settings-module=django_dx.settings
@@ -121,7 +121,7 @@ disable=missing-docstring
 
 Change **django_dx.settings** for your project settings.py path
 
-### VSCode integration
+### Pylint VSCode integration
 
 VSCode can display pylint information in the editor as you code. Here's my configuration in `.vscode/settings.json`:
 
@@ -141,7 +141,7 @@ VSCode can display pylint information in the editor as you code. Here's my confi
 poetry add -D isort
 ```
 
-### VSCode integration
+### isort VSCode integration
 
 VSCode can sort your import with the `Python Refactor: Sort Imports` command.
 
@@ -167,7 +167,7 @@ VSCode can sort your import with the `Python Refactor: Sort Imports` command.
 poestry add -D autopep8
 ```
 
-### VSCode integration
+### autopep8 VSCode integration
 
 Like the other tools, it's dierctly integrated with VSCode and you just need to turn it on. I only change the max-line-length to 120 because I find the default (80) to small.
 
@@ -191,13 +191,13 @@ Like the other tools, it's dierctly integrated with VSCode and you just need to 
 
 Any config in settings.py that is secret or that change between environment should be replaced with an environment variable.
 
-### Installation
+### python-dotenv Installation
 
 ```sh
 poetry add python-dotenv
 ```
 
-### Usage
+### python-dotenv Usage
 
 Add this to the top of your `settings.json`
 
@@ -254,7 +254,7 @@ Many managed production environment like Heroku, App Engine, etc to provide you 
 
 [pytest](https://docs.pytest.org/) is a unit test framework that improves on Python's unittest library. It's a drop-in replacement with some extra features that are very useful like running the tests directly in VSCode.
 
-### Installation
+### Pytest Installation
 
 I use `pytest-django` plugin which includes the dependency on `pytest` and allow configuration of Django.
 
@@ -272,7 +272,7 @@ python_files = tests.py test_*.py *_tests.py
 
 Replace `django_dx.settings` with the path to your `settings.py`.
 
-### Usage
+### Pytest Usage
 
 Simply add your tests as usual in your app `tests.py` file. And simply run
 
@@ -282,7 +282,7 @@ pytest
 
 The test will show in VSCode in the testing tab. You'll be able to run tests individually and also debug them.
 
-### Tips
+### Pytest Tips
 
 If the `tests.py` file gets too large, you can split them by creating a `tests` folder like this:
 
@@ -300,7 +300,7 @@ Sooner or later you'll want to make your application available to other people. 
 
 [Gunicorn](https://gunicorn.org/) is one of the most popular option. It's scalable and easy to use.
 
-### Installation
+### Gunicorn Installation
 
 ```sh
 poetry add gunicorn
@@ -321,7 +321,7 @@ errorlog = "-"
 
 All these options can also be passed to the gunicorn command line executable but I prefer to add them like this to use env variable. Each servers can be configured with own CPU/RAM to use a different amount of workers and threads.
 
-### Usage
+### Gunicorn Usage
 
 You can run gunicorn at any time with this:
 
@@ -331,17 +331,39 @@ gunicorn django_dx.wsgi:application
 
 You will want to keep using `runserver` in development because of the autoreload.
 
-### Tips
+### Gunicorn Tips
 
 Configure workers with this rule:
 
 > A positive integer generally in the 2-4 x $(NUM_CORES) range. You’ll want to vary this a bit to find the best for your particular application’s work load.
 
+## Django Cache Framework
+
+### DCF Installation
+
+It's already part of Django and simply needs to be activated in `settings.py`:
+
+```py
+# Cache
+# https://docs.djangoproject.com/en/4.1/topics/cache/
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379'),
+    }
+}
+```
+
+### DCF Usage
+
+[https://docs.djangoproject.com/en/4.1/topics/cache/](https://docs.djangoproject.com/en/4.1/topics/cache/)
+
 ## Celery
 
 [Celery](https://docs.celeryq.dev/) is an asynchronous task queue to run background task. Use it to asynchronously run any piece of code fetching or pushing to external services or methods that takes some time to process.
 
-## Installation
+## Celery Installation
 
 ```sh
 poetry add "celery[redis]"
@@ -391,7 +413,7 @@ CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
 CELERY_RESULT_BACKEND = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
 ```
 
-### Usage
+### Celery Usage
 
 Add your task in `tasks.py` in your django apps.
 
@@ -419,7 +441,7 @@ You need to start a worker to process the tasks. Note that the workers don't sup
 celery -A proj worker -l INFO
 ```
 
-### Tips: Autoretry
+### Celery Tips: Autoretry
 
 Use autoretry make sending emails resilient to SMTP failures.
 
@@ -431,7 +453,7 @@ def send_email(...)
 
 This will retry sending the email every 5 minutes for 3 hours.
 
-### Tips: Queuing tasks in production
+### Celery Tips: Queuing tasks in production
 
 When I want to manually queue a background task in production, I sometimes connect to a server and use django's `shell` command:
 
@@ -512,7 +534,7 @@ And then you can run the develoment server as usual, without having to install a
 python manage.py runserver
 ```
 
-### Tips: Dev defaults
+### Docker Compose Tips: Dev defaults
 
 I try to set the defaults value in the `settings.py` file to the coniguration of the services in the `docker-compose.yml`. The reason is that it makes it easy for new contributor to start the project without having to configure anything without compromising flexibility of setting the production configuration with environment variable.
 
@@ -563,7 +585,7 @@ RUN python manage.py collectstatic --noinput
 CMD ["gunicorn", "--worker-tmp-dir", "/dev/shm", "django_dx.wsgi:application"]
 ```
 
-### Usage
+### Docker Usage
 
 Build the image
 
@@ -577,11 +599,10 @@ Run the image
 docker run --rm -it -p 8000:8000 django_dx
 ```
 
-### Tips: Development
+### Docker Tips: Development
 
 I mostly use this Dockerfile for production but I occasionnaly build/run the image on my development environment to test the image. It's a useful way to replicate the production runtime on my desktop.
 
-### Tips: Production
+### Docker Tips: Production
 
 I use Github Actions to build and push the docker image to Github's Container registry. Then, I fetch and run the image on my production setup.
-
