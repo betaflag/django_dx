@@ -2,20 +2,20 @@
 
 This repository is my version of Django Cookie Cutter with all the things that I setup for most of my Django projects
 
-- [#pyenv]
-- [#poetry]
-- [#pylint]
-- [#isort]
-- [#autopep8]
-- [#python-dot-env]
-- [#pytest]
-- [#gunicorn]
-- [#django-cache-framework]
-- [#celery]
-- [#docker-compose]
-- [#docker]
-- [#dependabot]
-- [#github-actions]
+- [#pyenv](#pyenv)
+- [#poetry](#poetry)
+- [#pylint](#pylint)
+- [#isort](#isort)
+- [#autopep8](#autopep8)
+- [#python-dotenv](#python-dotenv)
+- [#pytest](#pytest)
+- [#gunicorn](#gunicorn)
+- [#django-cache-framework](#django-cache-framework)
+- [#celery](#celery)
+- [#docker-compose](#docker-compose)
+- [#docker](#docker)
+- [#dependabot](#dependabot)
+- [#github-actions](#github-actions)
 
 ## Pyenv
 
