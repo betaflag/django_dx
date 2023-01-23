@@ -10,7 +10,7 @@ packages = [{include = "django_dx"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 Django = "^4.1.4"
-python-dotenv = "^0.21.0"
+python-dotenv = "^0.21.1"
 psycopg2 = "^2.9.5"
 gunicorn = "^20.1.0"
 celery = {extras = ["redis"], version = "^5.2.7"}
@@ -19,7 +19,7 @@ celery = {extras = ["redis"], version = "^5.2.7"}
 autopep8 = "^1.7.0"
 pylint-django = "^2.5.3"
 pytest-django = "^4.5.2"
-python-dotenv = "^0.21.0"
+python-dotenv = "^0.21.1"
 isort = "^5.10.1"
 
 [build-system]
