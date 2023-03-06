@@ -16,7 +16,7 @@ gunicorn = "^20.1.0"
 celery = {extras = ["redis"], version = "^5.2.7"}
 
 [tool.poetry.group.dev.dependencies]
-autopep8 = "^1.7.0"
+autopep8 = "^2.0.2"
 pylint-django = "^2.5.3"
 pytest-django = "^4.5.2"
 python-dotenv = "^0.21.0"
